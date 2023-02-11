@@ -1,5 +1,7 @@
 import requests
 import selectorlib
+from emailing import send_email
+
 
 URL = "http://programmer100.pythonanywhere.com/"
 HEADER = HEADERS = {
@@ -26,8 +28,7 @@ def extract(source):
     return value
 
 
-def send_email():
-    print("Email was sent")
+
 
 
 def store(extracted):
@@ -43,4 +44,4 @@ if __name__ == "__main__":
     content = read(extracted)
     if extracted != "No temperature":
         if extracted not in "data.txt":
-            send_email()
+            send_email(message=content)

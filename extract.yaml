@@ -1,6 +1,3 @@
 value:
 
-  css: '#temperatureId'
-
-temperature:
-  css: '#temperatureLabel'
+  css: '#displaytimer'

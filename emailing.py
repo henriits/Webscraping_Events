@@ -12,7 +12,7 @@ PASSWORD = os.environ.get("Gmail_PASSWORD")
 
 def send_email(message):
     email_message = EmailMessage()
-    email_message["Subject"] = "Temperature!"
+    email_message["Subject"] = "Update!"
     # email_message.set_content("Hey, we just saw a new customer!")
 
     gmail = smtplib.SMTP("smtp.gmail.com", port=587)

@@ -2,6 +2,11 @@ import requests
 import selectorlib
 from emailing import send_email
 from datetime import datetime
+import sqlite3
+import time
+
+"INSERT INTO events VALUES ('Tigers', 'Tiger city','2088.10.14') "
+"SELECT * FROM events WHERE date='2088.10.15'"
 
 URL = "http://programmer100.pythonanywhere.com/tours/"
 HEADER = HEADERS = {
@@ -10,6 +15,8 @@ HEADER = HEADERS = {
 
 now = datetime.now()
 datetime_string = now.strftime("%d/%m/%Y %H:%M:%S")
+
+connection = sqlite3.connect("data.db")
 
 
 def scrape(URL):
@@ -20,8 +27,14 @@ def scrape(URL):
 
 
 def read(extracted):
-    with open("data.txt", "r") as file:
-        return file.read()
+    row = extracted.split(",")
+    row = [item.strip() for item in row]
+    band, city, date = row
+    cursor = connection.cursor()
+    cursor.execute("SELECT band,date FROM events WHERE band=? AND city=? AND date=?", (band, city, date))
+    rows = cursor.fetchall()
+    print(rows)
+    return rows
 
 
 def extract(source):
@@ -31,23 +44,22 @@ def extract(source):
     return value
 
 
-
-
-
 def store(extracted):
     with open("data.txt", "a") as file:
         file.write(datetime_string + "," + extracted + "\n")
 
 
 if __name__ == "__main__":
-    # while True:    with this program runs nonstop
+    while True:  # with this program runs nonstop
 
-    scraped = (scrape(URL))
-    extracted = extract(scraped)
-    print(extracted)
-    store(extracted)
-    content = read(extracted)
-    if extracted != "No temperature":
-        if extracted not in "data.txt":
-            send_email(message=content)
-    # time.sleep(2)  runs every 2 seconds
+        scraped = (scrape(URL))
+        extracted = extract(scraped)
+        print(extracted)
+        store(extracted)
+
+        if extracted != "No upcoming tours":
+            row = read(extracted)
+            if not row:
+                store(extracted)
+                send_email(message="Hey, new event was found!")
+        time.sleep(2)  # runs every 2 seconds

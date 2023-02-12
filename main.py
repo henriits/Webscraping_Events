@@ -45,8 +45,11 @@ def extract(source):
 
 
 def store(extracted):
-    with open("data.txt", "a") as file:
-        file.write(datetime_string + "," + extracted + "\n")
+    row = extracted.split(",")
+    row = [item.strip() for item in row]
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO events VALUES(?,?,?)", row)
+    connection.commit()
 
 
 if __name__ == "__main__":
@@ -55,11 +58,10 @@ if __name__ == "__main__":
         scraped = (scrape(URL))
         extracted = extract(scraped)
         print(extracted)
-        store(extracted)
 
         if extracted != "No upcoming tours":
             row = read(extracted)
             if not row:
                 store(extracted)
-                send_email(message="Hey, new event was found!")
+                send_email(message="Hello, new event was found!")
         time.sleep(2)  # runs every 2 seconds
